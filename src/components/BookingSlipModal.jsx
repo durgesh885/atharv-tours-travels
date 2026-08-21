@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles, Image as ImageIcon } from 'lucide-react';
+import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles, Image as ImageIcon, Copy } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { WhatsAppIcon } from './Icons';
 
@@ -7,6 +7,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const [selectedCar, setSelectedCar] = useState('Swift Dzire (4+1 AC Sedan)');
   const [customerName, setCustomerName] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [copiedNotification, setCopiedNotification] = useState(false);
   const ticketRef = useRef(null);
 
   if (!isOpen || !bookingData) return null;
@@ -14,70 +15,73 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Handle WhatsApp Image Share & Dispatch
+  // Handle WhatsApp Image Share & Clipboard Copy
   const handleSendTicketImage = async () => {
     setIsSending(true);
-
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://atharv-tours-travels.vercel.app';
-    const liveTicketUrl = `${origin}/?ticket=${slipId}&from=${encodeURIComponent(pickup || 'Chakan, Pune')}&to=${encodeURIComponent(drop || 'Mumbai')}&trip=${encodeURIComponent(tripType)}&car=${encodeURIComponent(selectedCar)}&date=${encodeURIComponent(date || 'Today')}`;
-
-    const formattedMessage = 
-      `🚖 *नवीन गाडी बुकिंग पावती (TICKET SLIP)* 🚖%0A` +
-      `🚩 *॥ जय मल्हार ॥ - अथर्व टुर्स ॲन्ड ट्रॅव्हल्स*%0A` +
-      `═════════════════════%0A` +
-      `🎫 *पावती क्र (SLIP NO):* ${slipId}%0A` +
-      `📍 *कुठून (PICKUP):* ${pickup || 'Chakan, Pune'}%0A` +
-      `🎯 *कुठे (DESTINATION):* ${drop || 'Airport / Outstation'}%0A` +
-      `🔄 *प्रकार (TRIP TYPE):* ${tripType}%0A` +
-      `📅 *तारीख (TRAVEL DATE):* ${date || 'Immediate / Today'}%0A` +
-      `🚗 *गाडी (VEHICLE):* ${selectedCar}%0A` +
-      (customerName.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.trim()}%0A` : '') +
-      `═════════════════════%0A` +
-      `🔗 *रंगीत पावती फोटो पहा (View Color Pass):*%0A` +
-      `${encodeURIComponent(liveTicketUrl)}%0A` +
-      `═════════════════════%0A` +
-      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), ही बुकिंग पावती पाठवली आहे. कृपया तुमचे सर्वात कमी भाडे (Rate) आणि गाडी उपलब्धता सांगावे._`;
 
     try {
       if (ticketRef.current) {
         const canvas = await html2canvas(ticketRef.current, {
-          scale: 2,
+          scale: 2.5,
           useCORS: true,
           backgroundColor: '#020617'
         });
 
-        // 1. If Mobile Native Share is available, share the actual PNG file
+        // 1. On Mobile Phones (Android & iOS): Native File Share
         if (navigator.share && navigator.canShare) {
           const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
           if (blob) {
             const file = new File([blob], `Atharv-Ticket-${slipId}.png`, { type: 'image/png' });
             if (navigator.canShare({ files: [file] })) {
-              await navigator.share({
-                files: [file],
-                title: 'Atharv Tours Booking Slip',
-                text: `🚖 Atharv Tours Ticket (${slipId}) - ${pickup} to ${drop}`
-              });
-              setIsSending(false);
-              onClose();
-              return;
+              try {
+                await navigator.share({
+                  files: [file],
+                  title: 'Atharv Tours Booking Ticket Slip'
+                });
+                setIsSending(false);
+                onClose();
+                return;
+              } catch (shareErr) {
+                // Fallback to clipboard & WhatsApp
+              }
             }
           }
         }
 
-        // 2. Otherwise download the image to gallery and open WhatsApp
+        // 2. On Laptops / PCs: Copy Image directly to Clipboard
+        if (navigator.clipboard && window.ClipboardItem) {
+          try {
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            if (blob) {
+              await navigator.clipboard.write([
+                new ClipboardItem({ 'image/png': blob })
+              ]);
+              setCopiedNotification(true);
+            }
+          } catch (clipErr) {
+            console.log('Clipboard copy fallback', clipErr);
+          }
+        }
+
+        // 3. Auto-download PNG image file to Laptop/Phone
         const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = image;
-        link.download = `Atharv-Tours-Ticket-${slipId}.png`;
+        link.download = `Atharv-Ticket-${slipId}.png`;
         link.click();
       }
     } catch (err) {
-      console.log('Image share fallback:', err);
+      console.log('Image generation error:', err);
     }
 
     setIsSending(false);
-    window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
-    onClose();
+
+    // Open WhatsApp Chat directly (No pre-filled text, pure image mode!)
+    window.open(`https://wa.me/919637886385`, '_blank');
+    
+    setTimeout(() => {
+      onClose();
+    }, 2000);
   };
 
   return (
@@ -101,7 +105,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
           <h3 className="text-lg font-black text-slate-900 mt-1">
             बुकिंग पावती (Ticket Slip)
           </h3>
-          <p className="text-[11px] text-slate-500">ही पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
+          <p className="text-[11px] text-slate-500">ही रंगीत पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
         </div>
 
         {/* --- ACTUAL COLORFUL TICKET CARD --- */}
@@ -236,6 +240,14 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             />
           </div>
 
+          {/* Notification if copied */}
+          {copiedNotification && (
+            <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs font-bold flex items-center gap-2">
+              <Check className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>पावती फोटो कॉपी केला आहे! WhatsApp मध्ये फक्त <strong>Ctrl + V (Paste)</strong> करा.</span>
+            </div>
+          )}
+
           {/* Send Ticket to WhatsApp */}
           <div className="pt-1">
             <button 
@@ -245,7 +257,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
               className="w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-sm cursor-pointer pulse-green active:scale-98"
             >
               <WhatsAppIcon className="w-5 h-5 fill-white shrink-0" />
-              <span>{isSending ? 'पावती पाठवत आहे...' : 'WhatsApp वर पावती फोटो पाठवा (Send Ticket)'}</span>
+              <span>{isSending ? 'पावती फोटो तयार होत आहे...' : 'WhatsApp वर फोटो पावती पाठवा'}</span>
             </button>
           </div>
         </div>
