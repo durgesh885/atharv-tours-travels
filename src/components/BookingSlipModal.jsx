@@ -1,18 +1,23 @@
-import React, { useState } from 'react';
-import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles, Image as ImageIcon } from 'lucide-react';
+import html2canvas from 'html2canvas';
 import { WhatsAppIcon } from './Icons';
 
 export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const [selectedCar, setSelectedCar] = useState('Swift Dzire (4+1 AC Sedan)');
   const [customerName, setCustomerName] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const ticketRef = useRef(null);
 
   if (!isOpen || !bookingData) return null;
 
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Fast, instant WhatsApp Ticket Dispatch
-  const handleSendTicket = () => {
+  // Handle WhatsApp Image Share & Dispatch
+  const handleSendTicketImage = async () => {
+    setIsSending(true);
+
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://atharv-tours-travels.vercel.app';
     const liveTicketUrl = `${origin}/?ticket=${slipId}&from=${encodeURIComponent(pickup || 'Chakan, Pune')}&to=${encodeURIComponent(drop || 'Mumbai')}&trip=${encodeURIComponent(tripType)}&car=${encodeURIComponent(selectedCar)}&date=${encodeURIComponent(date || 'Today')}`;
 
@@ -31,8 +36,46 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
       `🔗 *रंगीत पावती फोटो पहा (View Color Pass):*%0A` +
       `${encodeURIComponent(liveTicketUrl)}%0A` +
       `═════════════════════%0A` +
-      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), मी ही बुकिंग पावती पाठवली आहे. कृपया तुमचे सर्वात कमी भाडे (Rate) आणि गाडी उपलब्धता सांगावी._`;
+      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), ही बुकिंग पावती पाठवली आहे. कृपया तुमचे सर्वात कमी भाडे (Rate) आणि गाडी उपलब्धता सांगावे._`;
 
+    try {
+      if (ticketRef.current) {
+        const canvas = await html2canvas(ticketRef.current, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#020617'
+        });
+
+        // 1. If Mobile Native Share is available, share the actual PNG file
+        if (navigator.share && navigator.canShare) {
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          if (blob) {
+            const file = new File([blob], `Atharv-Ticket-${slipId}.png`, { type: 'image/png' });
+            if (navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: 'Atharv Tours Booking Slip',
+                text: `🚖 Atharv Tours Ticket (${slipId}) - ${pickup} to ${drop}`
+              });
+              setIsSending(false);
+              onClose();
+              return;
+            }
+          }
+        }
+
+        // 2. Otherwise download the image to gallery and open WhatsApp
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = `Atharv-Tours-Ticket-${slipId}.png`;
+        link.click();
+      }
+    } catch (err) {
+      console.log('Image share fallback:', err);
+    }
+
+    setIsSending(false);
     window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
     onClose();
   };
@@ -61,8 +104,11 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
           <p className="text-[11px] text-slate-500">ही पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
         </div>
 
-        {/* Visual Ticket Card */}
-        <div className="my-3.5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-xl border border-slate-800 relative overflow-hidden">
+        {/* --- ACTUAL COLORFUL TICKET CARD --- */}
+        <div 
+          ref={ticketRef} 
+          className="my-3.5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-xl border border-slate-800 relative overflow-hidden"
+        >
           {/* Ticket Notches */}
           <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white"></div>
           <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white"></div>
@@ -133,6 +179,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             </div>
           </div>
         </div>
+        {/* --- END TICKET --- */}
 
         {/* Vehicle Selection */}
         <div className="space-y-3">
@@ -193,11 +240,12 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
           <div className="pt-1">
             <button 
               type="button"
-              onClick={handleSendTicket}
+              disabled={isSending}
+              onClick={handleSendTicketImage}
               className="w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-sm cursor-pointer pulse-green active:scale-98"
             >
               <WhatsAppIcon className="w-5 h-5 fill-white shrink-0" />
-              <span>WhatsApp वर पावती पाठवा (Send Ticket)</span>
+              <span>{isSending ? 'पावती पाठवत आहे...' : 'WhatsApp वर पावती फोटो पाठवा (Send Ticket)'}</span>
             </button>
           </div>
         </div>
