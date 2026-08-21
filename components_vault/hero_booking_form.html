@@ -1,0 +1,82 @@
+<!-- ARCHIVED COMPONENT: Multi-field Hero Booking Form -->
+<!-- To restore: Replace the 1-Tap Instant Connect card in #home hero section with this form -->
+<div class="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-2xl text-slate-800 border border-slate-100">
+  <div class="border-b border-slate-100 pb-3 mb-4">
+    <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center">
+      <i class="fa-solid fa-bolt text-orange-500 mr-2"></i> Fast WhatsApp Booking
+    </h3>
+    <p class="text-xs text-slate-500 mt-0.5">Direct quotation & instant confirmation from Atharv Tours</p>
+  </div>
+
+  <form id="heroBookingForm" class="space-y-3 sm:space-y-4" onsubmit="handleHeroBooking(event)">
+    <div>
+      <label class="block text-xs font-semibold text-slate-600 mb-1.5">Trip Type</label>
+      <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
+        <label class="cursor-pointer">
+          <input type="radio" name="tripType" value="Outstation / All India" checked class="peer sr-only" />
+          <div class="text-[11px] sm:text-xs text-center py-2 px-1 rounded-xl border border-slate-200 peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-600 font-semibold transition">
+            Outstation / All India
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="tripType" value="Local Rental (8hr/80km)" class="peer sr-only" />
+          <div class="text-[11px] sm:text-xs text-center py-2 px-1 rounded-xl border border-slate-200 peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-600 font-semibold transition">
+            Local 8hr/80km
+          </div>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="tripType" value="Airport Drop / Pickup" class="peer sr-only" />
+          <div class="text-[11px] sm:text-xs text-center py-2 px-1 rounded-xl border border-slate-200 peer-checked:bg-orange-600 peer-checked:text-white peer-checked:border-orange-600 font-semibold transition">
+            Airport Drop
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Pickup Location</label>
+        <div class="relative">
+          <i class="fa-solid fa-location-dot absolute left-3 top-3 text-slate-400 text-xs"></i>
+          <input type="text" id="pickupLoc" required placeholder="eg. Chakan / Pune" class="w-full pl-8 pr-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 focus:bg-white" />
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Destination / Drop</label>
+        <div class="relative">
+          <i class="fa-solid fa-map-pin absolute left-3 top-3 text-slate-400 text-xs"></i>
+          <input type="text" id="dropLoc" required placeholder="eg. Mumbai / Shirdi / Goa" class="w-full pl-8 pr-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 focus:bg-white" />
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Select Car</label>
+        <select id="carType" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 focus:bg-white font-medium">
+          <option value="Swift Dzire (4+1 AC Sedan)">Swift Dzire (4+1 AC Sedan)</option>
+          <option value="Maruti Ertiga (6+1 AC MUV)">Maruti Ertiga (6+1 AC MUV)</option>
+          <option value="Innova Crysta / Other (On Demand)">Innova Crysta / Other (On Demand)</option>
+          <option value="Tempo Traveller (Group Travel)">Tempo Traveller (Group Travel)</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-semibold text-slate-600 mb-1">Travel Date</label>
+        <input type="date" id="travelDate" required class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 focus:bg-white" />
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-semibold text-slate-600 mb-1">Your Name & Mobile Number</label>
+      <div class="grid grid-cols-2 gap-2">
+        <input type="text" id="custName" required placeholder="Your Name" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 focus:bg-white" />
+        <input type="tel" id="custPhone" required placeholder="Mobile Number" class="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none bg-slate-50 focus:bg-white" />
+      </div>
+    </div>
+
+    <button type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-sm sm:text-base cursor-pointer">
+      <i class="fa-brands fa-whatsapp text-lg"></i>
+      <span>Get Instant Quote on WhatsApp</span>
+    </button>
+  </form>
+</div>

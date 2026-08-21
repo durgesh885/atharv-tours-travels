@@ -1,0 +1,31 @@
+{
+  "name": "travel-agency-website",
+  "version": "1.0.0",
+  "description": "This project is for building a high-converting, modern **Travel Agency Website** for a client/friend (+91 91128 39521). The primary goals: 1. **Google Maps / Google Business Profile Listing**: Provide an official website URL for the business listing. 2. **Direct Lead Generation**: WhatsApp and Call buttons for immediate customer booking inquiries. 3. **Showcase Services & Fleet**: Display available cars/cabs, tour packages, pricing/rates, and contact details.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "clsx": "^2.1.1",
+    "lucide-react": "^1.33.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.0",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.26",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.2"
+  },
+  "type": "module"
+}
