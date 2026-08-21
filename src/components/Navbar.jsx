@@ -14,8 +14,8 @@ export default function Navbar() {
             <span className="text-orange-400 font-extrabold flex items-center tracking-wide shrink-0">
               <span className="mr-1.5">🚩</span> ॥ जय मल्हार ॥
             </span>
-            <a href="tel:+917507990227" className="flex items-center text-slate-200 hover:text-orange-400 transition font-medium shrink-0">
-              <Phone className="w-3.5 h-3.5 text-orange-500 mr-1.5 shrink-0" /> 24x7 Helpline: <strong className="ml-1 text-white font-bold">+91 75079 90227 (Navneet Patil)</strong>
+            <a href="tel:+919637886385" className="flex items-center text-slate-200 hover:text-orange-400 transition font-medium shrink-0">
+              <Phone className="w-3.5 h-3.5 text-orange-500 mr-1.5 shrink-0" /> 24x7 Helpline: <strong className="ml-1 text-white font-bold">+91 96378 86385 (Navneet Patil)</strong>
             </a>
             <span className="text-slate-400 flex items-center shrink-0">
               <span className="text-orange-500 mr-1.5">📍</span> Medankarwadi, Chakan, Pune - 410501
@@ -69,8 +69,8 @@ export default function Navbar() {
 
             {/* Right Action Buttons (Desktop) */}
             <div className="hidden lg:flex items-center space-x-2.5 shrink-0 whitespace-nowrap">
-              <a href="tel:+917507990227" className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 font-bold hover:bg-slate-50 hover:border-slate-300 transition flex items-center text-xs shadow-sm">
-                <Phone className="w-3.5 h-3.5 text-orange-600 mr-1.5 shrink-0" /> +91 75079 90227
+              <a href="tel:+919637886385" className="px-3.5 py-2.5 rounded-xl border border-slate-200 text-slate-800 font-bold hover:bg-slate-50 hover:border-slate-300 transition flex items-center text-xs shadow-sm">
+                <Phone className="w-3.5 h-3.5 text-orange-600 mr-1.5 shrink-0" /> +91 96378 86385
               </a>
               <a href="https://wa.me/919637886385?text=Hello%20Navneet%20ji,%20I%20want%20to%20inquire%20about%20a%20cab." target="_blank" rel="noreferrer" className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md shadow-emerald-600/20 transition flex items-center text-xs gap-1.5">
                 <WhatsAppIcon className="w-4 h-4 fill-white shrink-0" />
@@ -112,7 +112,7 @@ export default function Navbar() {
             <a href="#contact" className="block py-2 text-sm hover:text-orange-600" onClick={() => setMobileOpen(false)}>📍 Contact & Office (Chakan)</a>
             
             <div className="pt-2 grid grid-cols-2 gap-2">
-              <a href="tel:+917507990227" className="text-center py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow">
+              <a href="tel:+919637886385" className="text-center py-2.5 bg-slate-900 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow">
                 <Phone className="w-3.5 h-3.5 text-orange-400" /> Call Now
               </a>
               <a href="https://wa.me/919637886385?text=Hello%20Navneet%20ji,%20I%20want%20to%20inquire%20about%20a%20cab." target="_blank" rel="noreferrer" className="text-center py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow">

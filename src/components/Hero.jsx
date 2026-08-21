@@ -75,11 +75,11 @@ export default function Hero() {
             {/* Quick Mobile Action Buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <a 
-                href="tel:+917507990227" 
+                href="tel:+919637886385" 
                 className="px-4 py-3 bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-xl border border-slate-700 shadow-md flex items-center gap-2 active:scale-95 transition whitespace-nowrap"
               >
                 <Phone className="w-4 h-4 text-orange-400 shrink-0" />
-                <span>Call +91 75079 90227</span>
+                <span>Call +91 96378 86385</span>
               </a>
 
               <a 

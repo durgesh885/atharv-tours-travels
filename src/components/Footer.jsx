@@ -48,8 +48,8 @@ export default function Footer() {
           <div className="md:col-span-4 space-y-2.5">
             <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">24x7 Direct Booking</h4>
             
-            <a href="tel:+917507990227" className="flex items-center text-white hover:text-orange-400 transition font-bold text-xs sm:text-sm whitespace-nowrap">
-              <Phone className="w-3.5 h-3.5 text-orange-500 mr-2 shrink-0" /> +91 75079 90227 <span className="text-[10px] font-normal text-slate-400 ml-1.5">(Navneet Patil)</span>
+            <a href="tel:+919637886385" className="flex items-center text-white hover:text-orange-400 transition font-bold text-xs sm:text-sm whitespace-nowrap">
+              <Phone className="w-3.5 h-3.5 text-orange-500 mr-2 shrink-0" /> +91 96378 86385 <span className="text-[10px] font-normal text-slate-400 ml-1.5">(Navneet Patil)</span>
             </a>
             
             <a href="https://wa.me/919637886385?text=Hello%20Navneet%20ji,%20I%20want%20to%20book%20a%20cab." target="_blank" rel="noreferrer" className="flex items-center text-emerald-400 hover:text-emerald-300 transition font-bold text-xs sm:text-sm whitespace-nowrap gap-1">

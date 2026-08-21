@@ -26,7 +26,7 @@ export default function Contact() {
           <div className="lg:col-span-5 grid sm:grid-cols-2 lg:grid-cols-1 gap-3.5">
             
             {/* Direct Calling Card */}
-            <a href="tel:+917507990227" className="p-4 sm:p-5 rounded-3xl bg-slate-50 hover:bg-orange-50/70 border border-slate-200 hover:border-orange-300 transition-all duration-300 flex items-start space-x-3.5 group shadow-sm block">
+            <a href="tel:+919637886385" className="p-4 sm:p-5 rounded-3xl bg-slate-50 hover:bg-orange-50/70 border border-slate-200 hover:border-orange-300 transition-all duration-300 flex items-start space-x-3.5 group shadow-sm block">
               <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-500 text-white flex items-center justify-center text-lg shrink-0 shadow-md group-hover:scale-110 transition-transform">
                 <Phone className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
@@ -36,7 +36,7 @@ export default function Contact() {
                   <span className="text-[10px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Available</span>
                 </div>
                 <h4 className="text-base sm:text-lg font-extrabold text-slate-900 mt-0.5 group-hover:text-orange-600 transition-colors whitespace-nowrap">
-                  +91 75079 90227
+                  +91 96378 86385
                 </h4>
                 <p className="text-xs text-slate-500 mt-0.5 font-medium whitespace-nowrap">Navneet Patil (प्रोप्रा. नवनीत पाटील)</p>
               </div>
