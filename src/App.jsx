@@ -9,6 +9,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import MobileBottomBar from './components/MobileBottomBar';
 import ReviewModal from './components/ReviewModal';
+import BookingSlipModal from './components/BookingSlipModal';
 
 const DEFAULT_REVIEWS = [
   {
@@ -54,6 +55,21 @@ export default function App() {
   });
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [urlTicketData, setUrlTicketData] = useState(null);
+
+  // Check if URL has ?ticket=... param from WhatsApp link
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ticket = params.get('ticket');
+    if (ticket) {
+      setUrlTicketData({
+        pickup: params.get('from') || 'Chakan, Pune',
+        drop: params.get('to') || 'Mumbai',
+        tripType: params.get('trip') || 'One Way',
+        date: params.get('date') || 'Today'
+      });
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem('atharv_reviews', JSON.stringify(reviews));
@@ -79,11 +95,25 @@ export default function App() {
       </main>
       <Footer />
       <MobileBottomBar />
+      
+      {/* Review Modal */}
       <ReviewModal 
         isOpen={isReviewModalOpen} 
         onClose={() => setIsReviewModalOpen(false)} 
         onSubmitReview={handleAddReview} 
       />
+
+      {/* URL Ticket Viewer Modal (When opened from WhatsApp Link) */}
+      {urlTicketData && (
+        <BookingSlipModal
+          isOpen={!!urlTicketData}
+          onClose={() => {
+            setUrlTicketData(null);
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }}
+          bookingData={urlTicketData}
+        />
+      )}
     </div>
   );
 }

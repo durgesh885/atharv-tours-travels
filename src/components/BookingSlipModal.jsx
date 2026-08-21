@@ -1,12 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles, Image as ImageIcon, Send } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { WhatsAppIcon } from './Icons';
 
 export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const [selectedCar, setSelectedCar] = useState('Swift Dzire (4+1 AC Sedan)');
   const [customerName, setCustomerName] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(true);
+  const [generatedImage, setGeneratedImage] = useState(null);
   const ticketRef = useRef(null);
 
   if (!isOpen || !bookingData) return null;
@@ -14,82 +15,87 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Generate Image from the Ticket DOM Element
-  const generateSlipImage = async () => {
-    if (!ticketRef.current) return null;
-    setIsGenerating(true);
-    try {
-      const canvas = await html2canvas(ticketRef.current, {
-        scale: 2.5,
-        useCORS: true,
-        backgroundColor: '#020617'
-      });
-      setIsGenerating(false);
-      return canvas;
-    } catch (err) {
-      console.error('Error creating image slip:', err);
-      setIsGenerating(false);
-      return null;
-    }
-  };
+  // Automatically generate Ticket Image as soon as modal opens
+  useEffect(() => {
+    let timeout = setTimeout(async () => {
+      if (ticketRef.current) {
+        try {
+          setIsGenerating(true);
+          const canvas = await html2canvas(ticketRef.current, {
+            scale: 2.5,
+            useCORS: true,
+            backgroundColor: '#020617'
+          });
+          setGeneratedImage(canvas.toDataURL('image/png'));
+          setIsGenerating(false);
+        } catch (err) {
+          console.error('Error creating image:', err);
+          setIsGenerating(false);
+        }
+      }
+    }, 400);
 
-  // Direct WhatsApp Send (Native Mobile File Share or Rich Formatted WhatsApp Invoice)
-  const handleSendToWhatsApp = async () => {
-    const formattedSlip = 
-      `┏━━━━━━━━━━━━━━━━━━━━━━━━━━┓%0A` +
-      `  🚖 *अथर्व टुर्स ॲन्ड ट्रॅव्हल्स - बुकिंग पावती* 🚖%0A` +
-      `  🚩 *॥ जय मल्हार ॥ (CHAKAN - PUNE)*%0A` +
-      `┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛%0A` +
-      `🎫 *पावती क्र (SLIP NO):* ${slipId}%0A%0A` +
+    return () => clearTimeout(timeout);
+  }, [selectedCar, customerName, isOpen]);
+
+  // Handle Share / Send Ticket
+  const handleSendTicket = async () => {
+    const liveTicketUrl = `${window.location.origin}/?ticket=${slipId}&from=${encodeURIComponent(pickup || 'Chakan')}&to=${encodeURIComponent(drop || 'Mumbai')}&trip=${encodeURIComponent(tripType)}&car=${encodeURIComponent(selectedCar)}&date=${encodeURIComponent(date || 'Today')}`;
+
+    const formattedMessage = 
+      `🚖 *नवीन गाडी बुकिंग पावती (TICKET SLIP)* 🚖%0A` +
+      `🚩 *॥ जय मल्हार ॥ - अथर्व टुर्स ॲन्ड ट्रॅव्हल्स*%0A` +
+      `═════════════════════%0A` +
+      `🎫 *पावती क्र (SLIP NO):* ${slipId}%0A` +
       `📍 *कुठून (PICKUP):* ${pickup || 'Chakan, Pune'}%0A` +
       `🎯 *कुठे (DESTINATION):* ${drop || 'Airport / Outstation'}%0A` +
       `🔄 *प्रकार (TRIP TYPE):* ${tripType}%0A` +
       `📅 *तारीख (TRAVEL DATE):* ${date || 'Immediate / Today'}%0A` +
       `🚗 *गाडी (VEHICLE):* ${selectedCar}%0A` +
       (customerName.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.trim()}%0A` : '') +
-      `──────────────────────────%0A` +
-      `✅ *24x7 ऑल इंडिया परमिट • Clean AC Cabs*%0A` +
-      `──────────────────────────%0A` +
-      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), ही बुकिंग पावती तपासून भाडे (Rate) आणि उपलब्धता सांगावी._`;
+      `═════════════════════%0A` +
+      `🔗 *रंगीत पावती फोटो पहा (View Color Pass):*%0A` +
+      `${encodeURIComponent(liveTicketUrl)}%0A` +
+      `═════════════════════%0A` +
+      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), ही बुकिंग पावती पाठवली आहे. कृपया तुमचे सर्वात कमी भाडे (Rate) सांगावे._`;
 
-    const canvas = await generateSlipImage();
-
-    // If on mobile and supports native image share directly to WhatsApp
-    if (canvas && navigator.share && navigator.canShare) {
+    // Try Mobile Native Share (Shares actual Image File into WhatsApp)
+    if (navigator.share && navigator.canShare && ticketRef.current) {
       try {
+        const canvas = await html2canvas(ticketRef.current, { scale: 2.5, useCORS: true, backgroundColor: '#020617' });
         canvas.toBlob(async (blob) => {
           if (blob) {
-            const file = new File([blob], `Atharv-Tours-Slip-${slipId}.png`, { type: 'image/png' });
+            const file = new File([blob], `Atharv-Tours-Ticket-${slipId}.png`, { type: 'image/png' });
             if (navigator.canShare({ files: [file] })) {
               try {
                 await navigator.share({
                   files: [file],
-                  title: 'Atharv Tours Booking Slip',
-                  text: `Atharv Tours Booking Slip (${slipId}) - ${pickup} to ${drop}`
+                  title: 'Atharv Tours Booking Ticket',
+                  text: `🚖 Atharv Tours Booking Ticket (${slipId})\n${pickup} ➔ ${drop}\nRate inquiry for Navneet Patil (+91 96378 86385)`
                 });
                 onClose();
                 return;
-              } catch (shareErr) {
-                // Fallback to direct chat
+              } catch (shareCancel) {
+                // User cancelled share
               }
             }
           }
-          window.open(`https://wa.me/919637886385?text=${formattedSlip}`, '_blank');
+          window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
           onClose();
         });
         return;
       } catch (e) {
-        console.log('Direct share fallback', e);
+        console.log('Native share fallback', e);
       }
     }
 
-    // Direct WhatsApp Chat with Clean Box Invoice Slip
-    window.open(`https://wa.me/919637886385?text=${formattedSlip}`, '_blank');
+    // Direct WhatsApp Chat with Live Color Slip Link
+    window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
       <div className="bg-white rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in-95 duration-200 my-auto">
         
         {/* Close Button */}
@@ -103,16 +109,17 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
 
         {/* Modal Header */}
         <div className="text-center pb-2 border-b border-slate-100">
-          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-            <Sparkles className="w-3 h-3" /> Booking Slip Preview
+          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <Sparkles className="w-3 h-3 text-emerald-600" />
+            {isGenerating ? 'पावती तयार होत आहे...' : '✅ पावती फोटो तयार आहे'}
           </span>
           <h3 className="text-lg font-black text-slate-900 mt-1">
-            बुकिंग पावती (Travel Slip)
+            बुकिंग पावती फोटो (Ticket Slip)
           </h3>
-          <p className="text-[11px] text-slate-500">ही पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
+          <p className="text-[11px] text-slate-500">ही रंगीत पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
         </div>
 
-        {/* --- ACTUAL COLORFUL PAPER TICKET CARD --- */}
+        {/* --- ACTUAL COLORFUL TICKET CARD (CONVERTED TO IMAGE) --- */}
         <div 
           ref={ticketRef} 
           className="my-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-xl border border-slate-800 relative overflow-hidden"
@@ -244,16 +251,15 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             />
           </div>
 
-          {/* Single Direct WhatsApp Button (No confusing download buttons) */}
+          {/* Send Ticket Image to WhatsApp */}
           <div className="pt-2">
             <button 
               type="button"
-              disabled={isGenerating}
-              onClick={handleSendToWhatsApp}
+              onClick={handleSendTicket}
               className="w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-sm cursor-pointer pulse-green active:scale-98"
             >
               <WhatsAppIcon className="w-5 h-5 fill-white shrink-0" />
-              <span>{isGenerating ? 'पावती तयार होत आहे...' : 'WhatsApp वर पावती पाठवा (Send Slip)'}</span>
+              <span>WhatsApp वर पावती फोटो पाठवा (Send Ticket)</span>
             </button>
           </div>
         </div>
