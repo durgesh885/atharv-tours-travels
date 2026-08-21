@@ -234,10 +234,16 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
 
     setIsSending(false);
 
-    // Formatted WhatsApp Receipt (Includes Image Link for Rich Photo Preview)
+    // Dedicated Fullscreen Live Ticket URL
+    const liveTicketUrl = `https://atharv-tours-travels.vercel.app/?ticket=${slipId}&from=${encodeURIComponent(pickup || 'Chakan, Pune')}&to=${encodeURIComponent(drop || 'Mumbai')}&trip=${encodeURIComponent(tripType || 'One Way')}&date=${encodeURIComponent(date || 'Today')}&car=${encodeURIComponent(selectedCar ? selectedCar.split(' ')[0] : 'Dzire')}&name=${encodeURIComponent(customerName.trim())}`;
+
+    // Formatted WhatsApp Receipt (Includes Live Fullscreen Ticket & Direct Photo Link)
     const formattedSlip = `🚩 *॥ जय मल्हार ॥*
 🎫 *नवीन गाडी बुकिंग पावती (TICKET SLIP)*
-${uploadedImageUrl ? `\n📸 *रंगीत पावती फोटो पहा (TICKET PHOTO):*\n${uploadedImageUrl}\n` : ''}
+
+🖼️ *रंगीत पावती फोटो पहा (VIEW FULL TICKET):*
+${liveTicketUrl}
+${uploadedImageUrl ? `\n📸 *थेट फोटो लिंक (HD IMAGE):*\n${uploadedImageUrl}` : ''}
 ━━━━━━━━━━━━━━━━━━━━
 📌 *पावती क्र (SLIP NO):* ${slipId}
 ${customerName?.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.trim()}\n` : ''}📍 *कुठून (PICKUP):* ${pickup || 'Chakan, Pune'}

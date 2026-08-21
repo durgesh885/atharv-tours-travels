@@ -41,6 +41,8 @@ const DEFAULT_REVIEWS = [
   }
 ];
 
+import TicketView from './components/TicketView';
+
 export default function App() {
   const [reviews, setReviews] = useState(() => {
     const saved = localStorage.getItem('atharv_reviews');
@@ -66,7 +68,10 @@ export default function App() {
         pickup: params.get('from') || 'Chakan, Pune',
         drop: params.get('to') || 'Mumbai',
         tripType: params.get('trip') || 'One Way',
-        date: params.get('date') || 'Today'
+        date: params.get('date') || 'Today',
+        car: params.get('car') || 'Swift Dzire',
+        name: params.get('name') || '',
+        slip: params.get('slip') || ticket
       });
     }
   }, []);
@@ -78,6 +83,19 @@ export default function App() {
   const handleAddReview = (newReview) => {
     setReviews([newReview, ...reviews]);
   };
+
+  // If user opened a ticket link from WhatsApp, render ONLY the Fullscreen Ticket
+  if (urlTicketData) {
+    return (
+      <TicketView
+        ticketData={urlTicketData}
+        onBackToHome={() => {
+          setUrlTicketData(null);
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-orange-500 selection:text-white pb-20 sm:pb-0">
@@ -102,18 +120,6 @@ export default function App() {
         onClose={() => setIsReviewModalOpen(false)} 
         onSubmitReview={handleAddReview} 
       />
-
-      {/* URL Ticket Viewer Modal (When opened from WhatsApp Link) */}
-      {urlTicketData && (
-        <BookingSlipModal
-          isOpen={!!urlTicketData}
-          onClose={() => {
-            setUrlTicketData(null);
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }}
-          bookingData={urlTicketData}
-        />
-      )}
     </div>
   );
 }
