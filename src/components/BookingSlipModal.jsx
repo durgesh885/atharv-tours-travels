@@ -237,26 +237,17 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
     // Dedicated Fullscreen Live Ticket URL
     const liveTicketUrl = `https://atharv-tours-travels.vercel.app/?ticket=${slipId}&from=${encodeURIComponent(pickup || 'Chakan, Pune')}&to=${encodeURIComponent(drop || 'Mumbai')}&trip=${encodeURIComponent(tripType || 'One Way')}&date=${encodeURIComponent(date || 'Today')}&car=${encodeURIComponent(selectedCar ? selectedCar.split(' ')[0] : 'Dzire')}&name=${encodeURIComponent(customerName.trim())}`;
 
-    // Formatted WhatsApp Receipt (Includes Live Fullscreen Ticket & Direct Photo Link)
+    // Clean & Short WhatsApp Booking Message for Navneet Patil
     const formattedSlip = `🚩 *॥ जय मल्हार ॥*
-🎫 *नवीन गाडी बुकिंग पावती (TICKET SLIP)*
+🚖 *नवीन गाडी बुकिंग चौकशी (NEW BOOKING INQUIRY)*
 
-🖼️ *रंगीत पावती फोटो पहा (VIEW FULL TICKET):*
-${liveTicketUrl}
-${uploadedImageUrl ? `\n📸 *थेट फोटो लिंक (HD IMAGE):*\n${uploadedImageUrl}` : ''}
-━━━━━━━━━━━━━━━━━━━━
-📌 *पावती क्र (SLIP NO):* ${slipId}
-${customerName?.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.trim()}\n` : ''}📍 *कुठून (PICKUP):* ${pickup || 'Chakan, Pune'}
-🏁 *कुठे (DESTINATION):* ${drop || 'Airport / Outstation'}
-🔄 *प्रकार (TRIP TYPE):* ${tripType}
-📅 *तारीख (DATE):* ${date || 'आज (Today)'}
-🚗 *गाडी (VEHICLE):* ${selectedCar}
-━━━━━━━━━━━━━━━━━━━━
-✨ *अथर्व टुर्स ॲन्ड ट्रॅव्हल्स (CHAKAN - PUNE)*
-👑 *प्रोप्रा. नवनीत पाटील* (📞 +91 96378 86385)
-🛡️ *24x7 Clean AC Cabs • All India Tourist Permit*
-━━━━━━━━━━━━━━━━━━━━
-_नमस्कार नवनीत भाऊ, वरील बुकिंगसाठी आपले सर्वात कमी भाडे (Best Rate) सांगावे._`;
+नमस्कार नवनीत भाऊ, ग्राहकाने वेबसाइटवरून गाडी बुकिंगची पावती पाठवली आहे.
+
+🎫 *रंगीत डिजिटल पावती पाहण्यासाठी खालील लिंकवर क्लिक करा:*
+👉 ${liveTicketUrl}
+
+_कृपया ही पावती पाहून आपले सर्वात कमी भाडे (Best Rate) सांगावे._
+✨ *अथर्व टुर्स ॲन्ड ट्रॅव्हल्स (CHAKAN - PUNE)*`;
 
     // Direct 1-Click Redirect to Navneet Patil WhatsApp (+91 96378 86385)
     window.location.href = `https://wa.me/919637886385?text=${encodeURIComponent(formattedSlip)}`;
