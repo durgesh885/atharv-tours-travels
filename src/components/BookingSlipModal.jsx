@@ -8,6 +8,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const [customerName, setCustomerName] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [copiedNotification, setCopiedNotification] = useState(false);
+  const [preGeneratedFile, setPreGeneratedFile] = useState(null);
   const ticketRef = useRef(null);
 
   if (!isOpen || !bookingData) return null;
@@ -15,69 +16,96 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
+  // Pre-generate image immediately when modal opens so click gesture is instant
+  React.useEffect(() => {
+    let isMounted = true;
+    const timer = setTimeout(async () => {
+      try {
+        if (ticketRef.current && isMounted) {
+          const canvas = await html2canvas(ticketRef.current, {
+            scale: 2.5,
+            useCORS: true,
+            backgroundColor: '#020617'
+          });
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+          if (blob && isMounted) {
+            const file = new File([blob], `Atharv-Ticket-${slipId}.png`, { type: 'image/png' });
+            setPreGeneratedFile(file);
+          }
+        }
+      } catch (e) {
+        console.log('Pre-render notice:', e);
+      }
+    }, 150);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+    };
+  }, [isOpen, selectedCar, customerName, pickup, drop, tripType, date]);
+
   // Handle WhatsApp Image Share & Fallback
   const handleSendTicketImage = async () => {
     setIsSending(true);
 
+    let fileToShare = preGeneratedFile;
+
     try {
-      if (ticketRef.current) {
+      if (!fileToShare && ticketRef.current) {
         const canvas = await html2canvas(ticketRef.current, {
           scale: 2.5,
           useCORS: true,
           backgroundColor: '#020617'
         });
-
-        // Auto-download PNG image file to Gallery/Downloads
-        const image = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = image;
-        link.download = `Atharv-Ticket-${slipId}.png`;
-        link.click();
-
-        // 1. On Mobile with Web Share API (Active on HTTPS / Production)
-        if (navigator.share && navigator.canShare) {
-          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-          if (blob) {
-            const file = new File([blob], `Atharv-Ticket-${slipId}.png`, { type: 'image/png' });
-            if (navigator.canShare({ files: [file] })) {
-              try {
-                await navigator.share({
-                  files: [file],
-                  title: 'Atharv Tours Booking Ticket Slip'
-                });
-                setIsSending(false);
-                onClose();
-                return;
-              } catch (shareErr) {
-                console.log('Native share canceled/fallback:', shareErr);
-                // If user interacted with the share sheet (sent or dismissed), do not open text fallback
-                if (shareErr.name === 'AbortError') {
-                  setIsSending(false);
-                  onClose();
-                  return;
-                }
-              }
-            }
-          }
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        if (blob) {
+          fileToShare = new File([blob], `Atharv-Ticket-${slipId}.png`, { type: 'image/png' });
         }
+      }
 
-        // 2. On Laptops / PCs: Copy Image directly to Clipboard
-        if (navigator.clipboard && window.ClipboardItem) {
-          try {
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-            if (blob) {
-              await navigator.clipboard.write([
-                new ClipboardItem({ 'image/png': blob })
-              ]);
-              setCopiedNotification(true);
-            }
-          } catch (clipErr) {
-            console.log('Clipboard copy fallback', clipErr);
+      // 1. On Mobile: Instant Native Share (passes only the PNG image file)
+      if (fileToShare && navigator.share && navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
+        try {
+          await navigator.share({
+            files: [fileToShare],
+            title: 'Atharv Tours Booking Ticket'
+          });
+          setIsSending(false);
+          onClose();
+          return;
+        } catch (shareErr) {
+          console.log('Native share:', shareErr);
+          if (shareErr.name === 'AbortError') {
+            setIsSending(false);
+            onClose();
+            return;
           }
         }
       }
+
+      // 2. Fallback: Save PNG to user's gallery / downloads
+      if (fileToShare) {
+        const url = URL.createObjectURL(fileToShare);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Atharv-Ticket-${slipId}.png`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }
+
+      // 3. Laptop/Desktop Clipboard copy
+      if (navigator.clipboard && window.ClipboardItem && fileToShare) {
+        try {
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': fileToShare })
+          ]);
+          setCopiedNotification(true);
+        } catch (clipErr) {
+          console.log('Clipboard fallback:', clipErr);
+        }
+      }
     } catch (err) {
-      console.log('Image generation error:', err);
+      console.log('Image share error:', err);
     }
 
     setIsSending(false);
