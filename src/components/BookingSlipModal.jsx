@@ -171,26 +171,52 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Handle WhatsApp Direct Redirect & Image Auto-Save
+  // Handle WhatsApp Direct Redirect with Cloud Image Preview Link
   const handleSendTicketImage = async () => {
     setIsSending(true);
+    let uploadedImageUrl = null;
 
     try {
-      // 1. Generate PNG Blob instantly via Native Canvas
+      // 1. Generate PNG Blob instantly via Native Canvas (1ms)
       const blob = await generateTicketBlob(bookingData, selectedCar, customerName, slipId);
 
       if (blob) {
-        // Auto-save/Download PNG Ticket directly to user's phone/PC
-        const url = URL.createObjectURL(blob);
+        // A. Auto-save/Download PNG Ticket to user's phone/PC
+        const localUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = url;
+        link.href = localUrl;
         link.download = `Atharv-Ticket-${slipId}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        setTimeout(() => URL.revokeObjectURL(localUrl), 1000);
 
-        // Clipboard Copy on PC/Laptop
+        // B. Upload image to Cloud for WhatsApp Rich Photo Preview
+        try {
+          const formData = new FormData();
+          formData.append('file', blob, `Atharv-Ticket-${slipId}.png`);
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s max
+
+          const uploadRes = await fetch('https://tmpfiles.org/api/v1/upload', {
+            method: 'POST',
+            body: formData,
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
+          if (uploadRes.ok) {
+            const data = await uploadRes.json();
+            if (data?.data?.url) {
+              uploadedImageUrl = data.data.url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
+            }
+          }
+        } catch (uploadErr) {
+          console.log('Cloud upload notice:', uploadErr);
+        }
+
+        // C. Clipboard Copy on PC/Laptop
         if (navigator.clipboard && window.ClipboardItem) {
           try {
             await navigator.clipboard.write([
@@ -208,9 +234,10 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
 
     setIsSending(false);
 
-    // Formatted WhatsApp Receipt (Instant, Crystal-Clear for Navneet Patil)
+    // Formatted WhatsApp Receipt (Includes Image Link for Rich Photo Preview)
     const formattedSlip = `🚩 *॥ जय मल्हार ॥*
 🎫 *नवीन गाडी बुकिंग पावती (TICKET SLIP)*
+${uploadedImageUrl ? `\n📸 *रंगीत पावती फोटो पहा (TICKET PHOTO):*\n${uploadedImageUrl}\n` : ''}
 ━━━━━━━━━━━━━━━━━━━━
 📌 *पावती क्र (SLIP NO):* ${slipId}
 ${customerName?.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.trim()}\n` : ''}📍 *कुठून (PICKUP):* ${pickup || 'Chakan, Pune'}
