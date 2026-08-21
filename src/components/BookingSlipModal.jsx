@@ -50,6 +50,12 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
                 return;
               } catch (shareErr) {
                 console.log('Native share canceled/fallback:', shareErr);
+                // If user interacted with the share sheet (sent or dismissed), do not open text fallback
+                if (shareErr.name === 'AbortError') {
+                  setIsSending(false);
+                  onClose();
+                  return;
+                }
               }
             }
           }
