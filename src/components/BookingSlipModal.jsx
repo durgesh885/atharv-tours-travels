@@ -1,46 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles, Image as ImageIcon, Send } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import React, { useState } from 'react';
+import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import { WhatsAppIcon } from './Icons';
 
 export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const [selectedCar, setSelectedCar] = useState('Swift Dzire (4+1 AC Sedan)');
   const [customerName, setCustomerName] = useState('');
-  const [isGenerating, setIsGenerating] = useState(true);
-  const [generatedImage, setGeneratedImage] = useState(null);
-  const ticketRef = useRef(null);
 
   if (!isOpen || !bookingData) return null;
 
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Automatically generate Ticket Image as soon as modal opens
-  useEffect(() => {
-    let timeout = setTimeout(async () => {
-      if (ticketRef.current) {
-        try {
-          setIsGenerating(true);
-          const canvas = await html2canvas(ticketRef.current, {
-            scale: 2.5,
-            useCORS: true,
-            backgroundColor: '#020617'
-          });
-          setGeneratedImage(canvas.toDataURL('image/png'));
-          setIsGenerating(false);
-        } catch (err) {
-          console.error('Error creating image:', err);
-          setIsGenerating(false);
-        }
-      }
-    }, 400);
-
-    return () => clearTimeout(timeout);
-  }, [selectedCar, customerName, isOpen]);
-
-  // Handle Share / Send Ticket
-  const handleSendTicket = async () => {
-    const liveTicketUrl = `${window.location.origin}/?ticket=${slipId}&from=${encodeURIComponent(pickup || 'Chakan')}&to=${encodeURIComponent(drop || 'Mumbai')}&trip=${encodeURIComponent(tripType)}&car=${encodeURIComponent(selectedCar)}&date=${encodeURIComponent(date || 'Today')}`;
+  // Fast, instant WhatsApp Ticket Dispatch
+  const handleSendTicket = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://atharv-tours-travels.vercel.app';
+    const liveTicketUrl = `${origin}/?ticket=${slipId}&from=${encodeURIComponent(pickup || 'Chakan, Pune')}&to=${encodeURIComponent(drop || 'Mumbai')}&trip=${encodeURIComponent(tripType)}&car=${encodeURIComponent(selectedCar)}&date=${encodeURIComponent(date || 'Today')}`;
 
     const formattedMessage = 
       `🚖 *नवीन गाडी बुकिंग पावती (TICKET SLIP)* 🚖%0A` +
@@ -57,46 +31,15 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
       `🔗 *रंगीत पावती फोटो पहा (View Color Pass):*%0A` +
       `${encodeURIComponent(liveTicketUrl)}%0A` +
       `═════════════════════%0A` +
-      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), ही बुकिंग पावती पाठवली आहे. कृपया तुमचे सर्वात कमी भाडे (Rate) सांगावे._`;
+      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), मी ही बुकिंग पावती पाठवली आहे. कृपया तुमचे सर्वात कमी भाडे (Rate) आणि गाडी उपलब्धता सांगावी._`;
 
-    // Try Mobile Native Share (Shares actual Image File into WhatsApp)
-    if (navigator.share && navigator.canShare && ticketRef.current) {
-      try {
-        const canvas = await html2canvas(ticketRef.current, { scale: 2.5, useCORS: true, backgroundColor: '#020617' });
-        canvas.toBlob(async (blob) => {
-          if (blob) {
-            const file = new File([blob], `Atharv-Tours-Ticket-${slipId}.png`, { type: 'image/png' });
-            if (navigator.canShare({ files: [file] })) {
-              try {
-                await navigator.share({
-                  files: [file],
-                  title: 'Atharv Tours Booking Ticket',
-                  text: `🚖 Atharv Tours Booking Ticket (${slipId})\n${pickup} ➔ ${drop}\nRate inquiry for Navneet Patil (+91 96378 86385)`
-                });
-                onClose();
-                return;
-              } catch (shareCancel) {
-                // User cancelled share
-              }
-            }
-          }
-          window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
-          onClose();
-        });
-        return;
-      } catch (e) {
-        console.log('Native share fallback', e);
-      }
-    }
-
-    // Direct WhatsApp Chat with Live Color Slip Link
     window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in-95 duration-200 my-auto">
+    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 relative animate-in fade-in zoom-in-95 duration-150 my-auto">
         
         {/* Close Button */}
         <button 
@@ -109,22 +52,18 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
 
         {/* Modal Header */}
         <div className="text-center pb-2 border-b border-slate-100">
-          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-            <Sparkles className="w-3 h-3 text-emerald-600" />
-            {isGenerating ? 'पावती तयार होत आहे...' : '✅ पावती फोटो तयार आहे'}
+          <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+            <Sparkles className="w-3 h-3 text-orange-500" /> Digital Travel Ticket
           </span>
           <h3 className="text-lg font-black text-slate-900 mt-1">
-            बुकिंग पावती फोटो (Ticket Slip)
+            बुकिंग पावती (Ticket Slip)
           </h3>
-          <p className="text-[11px] text-slate-500">ही रंगीत पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
+          <p className="text-[11px] text-slate-500">ही पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
         </div>
 
-        {/* --- ACTUAL COLORFUL TICKET CARD (CONVERTED TO IMAGE) --- */}
-        <div 
-          ref={ticketRef} 
-          className="my-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-xl border border-slate-800 relative overflow-hidden"
-        >
-          {/* Authentic Ticket Notches */}
+        {/* Visual Ticket Card */}
+        <div className="my-3.5 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-xl border border-slate-800 relative overflow-hidden">
+          {/* Ticket Notches */}
           <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white"></div>
           <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white"></div>
 
@@ -194,10 +133,9 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             </div>
           </div>
         </div>
-        {/* --- END TICKET --- */}
 
         {/* Vehicle Selection */}
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           <div>
             <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
               पसंतीची गाडी निवडा (Choose Cab)
@@ -206,9 +144,9 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
               <button
                 type="button"
                 onClick={() => setSelectedCar('Swift Dzire (4+1 AC Sedan)')}
-                className={`p-2 rounded-xl text-xs font-bold text-left transition border ${
+                className={`p-2.5 rounded-xl text-xs font-bold text-left transition border ${
                   selectedCar.includes('Dzire')
-                    ? 'border-orange-600 bg-orange-50 text-orange-950 shadow-sm'
+                    ? 'border-orange-600 bg-orange-50 text-orange-950 shadow-sm ring-1 ring-orange-500'
                     : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
@@ -216,15 +154,15 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
                   <span>🚗 Swift Dzire</span>
                   {selectedCar.includes('Dzire') && <Check className="w-3.5 h-3.5 text-orange-600" />}
                 </div>
-                <span className="text-[10px] font-normal text-slate-500 block">4+1 AC Sedan</span>
+                <span className="text-[10px] font-normal text-slate-500 block mt-0.5">4+1 AC Sedan</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setSelectedCar('Maruti Ertiga (6+1 AC 7-Seater)')}
-                className={`p-2 rounded-xl text-xs font-bold text-left transition border ${
+                className={`p-2.5 rounded-xl text-xs font-bold text-left transition border ${
                   selectedCar.includes('Ertiga')
-                    ? 'border-orange-600 bg-orange-50 text-orange-950 shadow-sm'
+                    ? 'border-orange-600 bg-orange-50 text-orange-950 shadow-sm ring-1 ring-orange-500'
                     : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
                 }`}
               >
@@ -232,7 +170,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
                   <span>🚐 Maruti Ertiga</span>
                   {selectedCar.includes('Ertiga') && <Check className="w-3.5 h-3.5 text-orange-600" />}
                 </div>
-                <span className="text-[10px] font-normal text-slate-500 block">6+1 AC 7-Seater</span>
+                <span className="text-[10px] font-normal text-slate-500 block mt-0.5">6+1 AC 7-Seater</span>
               </button>
             </div>
           </div>
@@ -247,19 +185,19 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
               value={customerName} 
               onChange={(e) => setCustomerName(e.target.value)}
               placeholder="e.g. Rahul Shinde" 
-              className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none" 
+              className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none" 
             />
           </div>
 
-          {/* Send Ticket Image to WhatsApp */}
-          <div className="pt-2">
+          {/* Send Ticket to WhatsApp */}
+          <div className="pt-1">
             <button 
               type="button"
               onClick={handleSendTicket}
               className="w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-sm cursor-pointer pulse-green active:scale-98"
             >
               <WhatsAppIcon className="w-5 h-5 fill-white shrink-0" />
-              <span>WhatsApp वर पावती फोटो पाठवा (Send Ticket)</span>
+              <span>WhatsApp वर पावती पाठवा (Send Ticket)</span>
             </button>
           </div>
         </div>
