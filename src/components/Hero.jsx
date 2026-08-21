@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MapPin, Flag, Calendar, Phone, MessageCircle, Snowflake, Star, ShieldCheck, Clock, ArrowDownUp, Check } from 'lucide-react';
+import { MapPin, Flag, Calendar, Phone, Snowflake, Star, ShieldCheck, Clock, ArrowDownUp, Check } from 'lucide-react';
+import { WhatsAppIcon } from './Icons';
 
 const TRIP_TYPES = [
   { id: 'One Way (एकेरी)', label: 'One Way', icon: '➔' },
@@ -51,8 +52,8 @@ export default function Hero() {
           {/* Left Hero Copy */}
           <div className="lg:col-span-7 space-y-5 sm:space-y-6 text-left">
             
-            {/* Cultural Badge */}
-            <div className="inline-flex items-center gap-2 bg-orange-600/30 border border-orange-500/40 text-orange-200 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm">
+            {/* Cultural Badge (Single Line) */}
+            <div className="inline-flex items-center gap-2 bg-orange-600/30 border border-orange-500/40 text-orange-200 px-3.5 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-sm whitespace-nowrap">
               <span>🚩 ॥ जय मल्हार ॥</span>
               <span className="text-orange-400">•</span>
               <span>24x7 Cab & Car Rental</span>
@@ -75,9 +76,9 @@ export default function Hero() {
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <a 
                 href="tel:+917507990227" 
-                className="px-4 py-3 bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-xl border border-slate-700 shadow-md flex items-center gap-2 active:scale-95 transition"
+                className="px-4 py-3 bg-slate-900/90 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-xl border border-slate-700 shadow-md flex items-center gap-2 active:scale-95 transition whitespace-nowrap"
               >
-                <Phone className="w-4 h-4 text-orange-400" />
+                <Phone className="w-4 h-4 text-orange-400 shrink-0" />
                 <span>Call +91 75079 90227</span>
               </a>
 
@@ -85,9 +86,9 @@ export default function Hero() {
                 href="https://wa.me/919637886385?text=Hello%20Navneet%20ji,%20I%20want%20to%20inquire%20about%20a%20cab." 
                 target="_blank" 
                 rel="noreferrer"
-                className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md flex items-center gap-2 active:scale-95 transition"
+                className="px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md flex items-center gap-2 active:scale-95 transition whitespace-nowrap"
               >
-                <MessageCircle className="w-4 h-4" />
+                <WhatsAppIcon className="w-4 h-4 fill-white shrink-0" />
                 <span>WhatsApp Quote</span>
               </a>
             </div>
@@ -95,30 +96,30 @@ export default function Hero() {
             {/* 4 Trust Badges Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl pt-2">
               
-              <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 shadow-sm">
+              <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 shadow-sm whitespace-nowrap">
                 <span className="text-sm sm:text-base font-extrabold text-orange-400 flex items-center gap-1">
-                  <Snowflake className="w-3.5 h-3.5 text-orange-300" /> 100%
+                  <Snowflake className="w-3.5 h-3.5 text-orange-300 shrink-0" /> 100%
                 </span>
                 <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium mt-0.5">Clean AC Cabs</p>
               </div>
 
-              <a href="#reviews" className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 hover:border-amber-400 transition block">
+              <a href="#reviews" className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 hover:border-amber-400 transition block whitespace-nowrap">
                 <span className="text-sm sm:text-base font-extrabold text-amber-400 flex items-center gap-1">
-                  4.9 <Star className="w-3.5 h-3.5 fill-amber-400" />
+                  4.9 <Star className="w-3.5 h-3.5 fill-amber-400 shrink-0" />
                 </span>
                 <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium mt-0.5">Google Verified</p>
               </a>
 
-              <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 shadow-sm">
+              <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 shadow-sm whitespace-nowrap">
                 <span className="text-sm sm:text-base font-extrabold text-emerald-400 flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" /> All India
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-300 shrink-0" /> All India
                 </span>
                 <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium mt-0.5">Tourist Permit</p>
               </div>
 
-              <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 shadow-sm">
+              <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl p-3 border border-slate-700/80 shadow-sm whitespace-nowrap">
                 <span className="text-sm sm:text-base font-extrabold text-blue-400 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-blue-300" /> 24x7
+                  <Clock className="w-3.5 h-3.5 text-blue-300 shrink-0" /> 24x7
                 </span>
                 <p className="text-[10px] sm:text-[11px] text-slate-300 font-medium mt-0.5">Doorstep Pickup</p>
               </div>
@@ -126,19 +127,19 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Hero Booking Card (Mobile-First Simple & Fast) */}
+          {/* Right Hero Booking Card (Mobile-First Clean & Fast) */}
           <div className="lg:col-span-5">
             <div className="bg-white rounded-3xl p-5 sm:p-7 shadow-2xl text-slate-800 border border-slate-100 space-y-4">
               
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="text-base sm:text-lg font-extrabold text-slate-900">
+                  <h3 className="text-base sm:text-lg font-extrabold text-slate-900 leading-tight">
                     Book Your Cab (गाडी बुक करा)
                   </h3>
-                  <p className="text-[11px] text-slate-500">Fast doorstep pickup across Pune & Chakan</p>
+                  <p className="text-[11px] text-slate-500 whitespace-nowrap">Doorstep pickup in Pune & Chakan</p>
                 </div>
-                <span className="text-xs font-extrabold text-orange-600">🚩 ॥ जय मल्हार ॥</span>
+                <span className="text-xs font-extrabold text-orange-600 shrink-0">🚩 ॥ जय मल्हार ॥</span>
               </div>
 
               {/* Trip Type Select Pills */}
@@ -152,14 +153,14 @@ export default function Hero() {
                       key={t.id}
                       type="button"
                       onClick={() => setTripType(t.id)}
-                      className={`py-2 px-2.5 rounded-xl text-xs font-bold text-left transition flex items-center justify-between ${
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold text-left transition flex items-center justify-between whitespace-nowrap ${
                         tripType === t.id
                           ? 'bg-orange-600 text-white shadow-sm'
                           : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
                       }`}
                     >
                       <span className="truncate">{t.label}</span>
-                      <span className="text-[10px] opacity-80 ml-1">{t.icon}</span>
+                      <span className="text-[10px] opacity-80 ml-1 shrink-0">{t.icon}</span>
                     </button>
                   ))}
                 </div>
@@ -182,7 +183,7 @@ export default function Hero() {
                   />
                 </div>
 
-                {/* Swap / Center divider */}
+                {/* Swap Divider */}
                 <div className="flex items-center justify-between -my-1.5 px-2">
                   <div className="h-px bg-slate-200 flex-1"></div>
                   <button 
@@ -196,7 +197,7 @@ export default function Hero() {
                   <div className="h-px bg-slate-200 flex-1"></div>
                 </div>
 
-                {/* Drop Destination */}
+                {/* Destination */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">
                     <Flag className="w-3 h-3 inline text-orange-600 mr-1" /> Destination (कुठे)
@@ -210,7 +211,7 @@ export default function Hero() {
                   />
                 </div>
 
-                {/* Date Input */}
+                {/* Travel Date */}
                 <div>
                   <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">
                     <Calendar className="w-3 h-3 inline text-slate-500 mr-1" /> Travel Date (तारीख)
@@ -229,16 +230,16 @@ export default function Hero() {
                   type="submit"
                   className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center space-x-2 text-xs sm:text-sm cursor-pointer pulse-green active:scale-98"
                 >
-                  <MessageCircle className="w-4 h-4" />
+                  <WhatsAppIcon className="w-4 h-4 fill-white shrink-0" />
                   <span>Get Instant Fare on WhatsApp</span>
                 </button>
               </form>
 
               {/* Owner Trust Note */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-                <span>Direct Owner: <strong className="text-slate-800 font-bold">Navneet Patil</strong></span>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500 whitespace-nowrap">
+                <span>Owner: <strong className="text-slate-800 font-bold">Navneet Patil</strong></span>
                 <span className="text-emerald-600 font-bold flex items-center gap-1">
-                  <Check className="w-3 h-3" /> Best Direct Rates
+                  <Check className="w-3 h-3" /> Best Rates
                 </span>
               </div>
 
