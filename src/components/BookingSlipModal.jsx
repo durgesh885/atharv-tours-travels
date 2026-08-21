@@ -158,17 +158,25 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             <div className="grid grid-cols-3 gap-2 pt-1.5 text-[10px] bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
               <div>
                 <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold block">प्रकार (TRIP)</span>
-                <p className="font-bold text-slate-200 truncate">{tripType}</p>
+                <p className="font-bold text-slate-200 truncate">{tripType.split(' ')[0]}</p>
               </div>
               <div>
                 <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold block">तारीख (DATE)</span>
-                <p className="font-bold text-slate-200 truncate">{date || 'Today'}</p>
+                <p className="font-bold text-slate-200 truncate">{date || 'आज (Today)'}</p>
               </div>
               <div>
                 <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold block">गाडी (CAR)</span>
                 <p className="font-bold text-orange-400 truncate">{selectedCar.split(' ')[0]} {selectedCar.split(' ')[1]}</p>
               </div>
             </div>
+
+            {/* Customer Name on Ticket if typed */}
+            {customerName.trim() && (
+              <div className="flex items-center justify-between text-[10px] bg-orange-950/40 border border-orange-500/30 px-2.5 py-1 rounded-lg text-orange-200">
+                <span className="text-[8px] uppercase font-bold text-orange-400">ग्राहक (CUSTOMER):</span>
+                <span className="font-bold">{customerName.trim()}</span>
+              </div>
+            )}
           </div>
 
           {/* Credentials */}
