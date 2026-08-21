@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles, Download, FileText } from 'lucide-react';
+import { X, MapPin, Flag, Calendar, Car, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
 import { WhatsAppIcon } from './Icons';
 
 export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
@@ -21,7 +20,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
     setIsGenerating(true);
     try {
       const canvas = await html2canvas(ticketRef.current, {
-        scale: 3, // Ultra-sharp 3x export
+        scale: 2.5,
         useCORS: true,
         backgroundColor: '#020617'
       });
@@ -34,92 +33,58 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
     }
   };
 
-  // 1. Download image to mobile gallery
-  const handleDownloadImage = async () => {
-    const canvas = await generateSlipImage();
-    if (!canvas) return;
-
-    const image = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.href = image;
-    link.download = `Atharv-Booking-Slip-${slipId}.png`;
-    link.click();
-  };
-
-  // 2. Download as PDF Ticket
-  const handleDownloadPDF = async () => {
-    const canvas = await generateSlipImage();
-    if (!canvas) return;
-
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: [105, 148] // A6 pocket ticket size
-    });
-
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`Atharv-Travel-Ticket-${slipId}.pdf`);
-  };
-
-  // 3. Share Image directly to WhatsApp (Web Share API) or Auto-Download + WhatsApp Chat
+  // Direct WhatsApp Send (Native Mobile File Share or Rich Formatted WhatsApp Invoice)
   const handleSendToWhatsApp = async () => {
-    const formattedMessage = 
-      `🚖 *नवीन गाडी बुकिंग पावती (TICKET SLIP)* 🚖%0A` +
-      `🚩 *॥ जय मल्हार ॥ - अथर्व टुर्स ॲन्ड ट्रॅव्हल्स*%0A` +
-      `═════════════════════%0A` +
-      `🎫 *पावती क्र (SLIP NO):* ${slipId}%0A` +
+    const formattedSlip = 
+      `┏━━━━━━━━━━━━━━━━━━━━━━━━━━┓%0A` +
+      `  🚖 *अथर्व टुर्स ॲन्ड ट्रॅव्हल्स - बुकिंग पावती* 🚖%0A` +
+      `  🚩 *॥ जय मल्हार ॥ (CHAKAN - PUNE)*%0A` +
+      `┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛%0A` +
+      `🎫 *पावती क्र (SLIP NO):* ${slipId}%0A%0A` +
       `📍 *कुठून (PICKUP):* ${pickup || 'Chakan, Pune'}%0A` +
       `🎯 *कुठे (DESTINATION):* ${drop || 'Airport / Outstation'}%0A` +
       `🔄 *प्रकार (TRIP TYPE):* ${tripType}%0A` +
       `📅 *तारीख (TRAVEL DATE):* ${date || 'Immediate / Today'}%0A` +
-      `🚗 *पसंतीची गाडी (CAR):* ${selectedCar}%0A` +
-      (customerName.trim() ? `👤 *ग्राहक नाव (NAME):* ${customerName.trim()}%0A` : '') +
-      `═════════════════════%0A` +
-      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), मी वरील बुकिंग पावती पाठवली आहे. कृपया तुमचे सर्वात कमी भाडे (Rate) सांगावे._`;
+      `🚗 *गाडी (VEHICLE):* ${selectedCar}%0A` +
+      (customerName.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.trim()}%0A` : '') +
+      `──────────────────────────%0A` +
+      `✅ *24x7 ऑल इंडिया परमिट • Clean AC Cabs*%0A` +
+      `──────────────────────────%0A` +
+      `_नमस्कार नवनीत पाटील भाऊ (+91 96378 86385), ही बुकिंग पावती तपासून भाडे (Rate) आणि उपलब्धता सांगावी._`;
 
     const canvas = await generateSlipImage();
 
-    // On Mobile: Try Native File Sharing directly to WhatsApp
+    // If on mobile and supports native image share directly to WhatsApp
     if (canvas && navigator.share && navigator.canShare) {
       try {
         canvas.toBlob(async (blob) => {
           if (blob) {
-            const file = new File([blob], `Atharv-Booking-Slip-${slipId}.png`, { type: 'image/png' });
+            const file = new File([blob], `Atharv-Tours-Slip-${slipId}.png`, { type: 'image/png' });
             if (navigator.canShare({ files: [file] })) {
               try {
                 await navigator.share({
                   files: [file],
                   title: 'Atharv Tours Booking Slip',
-                  text: `Atharv Tours & Travels Booking Slip (${slipId}) - ${pickup} to ${drop}`
+                  text: `Atharv Tours Booking Slip (${slipId}) - ${pickup} to ${drop}`
                 });
                 onClose();
                 return;
-              } catch (shareError) {
-                // User cancelled or fallback
+              } catch (shareErr) {
+                // Fallback to direct chat
               }
             }
           }
-          // If share fails, auto-download image & open WhatsApp
-          handleDownloadImage();
-          window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
+          window.open(`https://wa.me/919637886385?text=${formattedSlip}`, '_blank');
           onClose();
         });
         return;
       } catch (e) {
-        console.log('Fallback to download + WhatsApp', e);
+        console.log('Direct share fallback', e);
       }
     }
 
-    // Default: Auto-download ticket image & open WhatsApp directly
-    if (canvas) {
-      handleDownloadImage();
-    }
-    window.open(`https://wa.me/919637886385?text=${formattedMessage}`, '_blank');
+    // Direct WhatsApp Chat with Clean Box Invoice Slip
+    window.open(`https://wa.me/919637886385?text=${formattedSlip}`, '_blank');
     onClose();
   };
 
@@ -136,30 +101,30 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
           <X className="w-5 h-5" />
         </button>
 
-        {/* Modal Title */}
+        {/* Modal Header */}
         <div className="text-center pb-2 border-b border-slate-100">
           <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-orange-600 bg-orange-50 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-            <Sparkles className="w-3 h-3" /> Official Digital Ticket Slip
+            <Sparkles className="w-3 h-3" /> Booking Slip Preview
           </span>
           <h3 className="text-lg font-black text-slate-900 mt-1">
-            बुकिंग पावती (Digital Travel Ticket)
+            बुकिंग पावती (Travel Slip)
           </h3>
-          <p className="text-[11px] text-slate-500">खालील पावती थेट इमेज/PDF द्वारे WhatsApp वर पाठवा</p>
+          <p className="text-[11px] text-slate-500">ही पावती थेट नवनीत पाटील यांच्या WhatsApp वर पाठवली जाईल</p>
         </div>
 
-        {/* --- ACTUAL PAPER TICKET CARD (CONVERTED TO IMAGE / PDF) --- */}
+        {/* --- ACTUAL COLORFUL PAPER TICKET CARD --- */}
         <div 
           ref={ticketRef} 
           className="my-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white shadow-xl border border-slate-800 relative overflow-hidden"
         >
-          {/* Decorative side notches for authentic ticket look */}
+          {/* Authentic Ticket Notches */}
           <div className="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white"></div>
           <div className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-white"></div>
 
-          {/* Top Ticket Header */}
-          <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
             <div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1.5">
                 <span className="text-sm font-black text-white tracking-tight">ATHARV <span className="text-orange-500">TRAVELS</span></span>
                 <span className="text-[9px] font-extrabold uppercase px-1.5 py-0.2 bg-orange-500 text-white rounded">24x7</span>
               </div>
@@ -172,29 +137,29 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
           </div>
 
           {/* Route Section */}
-          <div className="my-3 py-2 border-b border-dashed border-slate-800 space-y-2">
+          <div className="my-2.5 py-2 border-b border-dashed border-slate-800 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-emerald-400 shrink-0" />
                 <div>
                   <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold block">कुठून (FROM)</span>
-                  <strong className="text-xs sm:text-sm text-white">{pickup || 'Chakan, Pune'}</strong>
+                  <strong className="text-xs sm:text-sm text-white leading-tight">{pickup || 'Chakan, Pune'}</strong>
                 </div>
               </div>
               
-              <span className="text-orange-400 font-bold text-xs">➔➔</span>
+              <span className="text-orange-400 font-bold text-xs px-2">➔➔</span>
 
               <div className="text-right flex items-center space-x-2 justify-end">
                 <div>
                   <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold block">कुठे (TO)</span>
-                  <strong className="text-xs sm:text-sm text-orange-300">{drop || 'Airport / Outstation'}</strong>
+                  <strong className="text-xs sm:text-sm text-orange-300 leading-tight">{drop || 'Airport / Outstation'}</strong>
                 </div>
                 <Flag className="w-4 h-4 text-orange-400 shrink-0" />
               </div>
             </div>
 
-            {/* 3-Column Info Grid */}
-            <div className="grid grid-cols-3 gap-2 pt-2 text-[10px] bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
+            {/* 3-Column Specs */}
+            <div className="grid grid-cols-3 gap-2 pt-1.5 text-[10px] bg-slate-900/90 p-2.5 rounded-xl border border-slate-800">
               <div>
                 <span className="text-[8px] uppercase tracking-wider text-slate-400 font-bold block">प्रकार (TRIP)</span>
                 <p className="font-bold text-slate-200 truncate">{tripType}</p>
@@ -210,7 +175,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             </div>
           </div>
 
-          {/* Bottom Slip Credentials & Proprietor */}
+          {/* Credentials */}
           <div className="flex items-center justify-between text-[9px] text-slate-400 pt-0.5">
             <div className="flex items-center space-x-1 text-emerald-400 font-semibold">
               <ShieldCheck className="w-3 h-3" />
@@ -222,7 +187,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             </div>
           </div>
         </div>
-        {/* --- END OF TICKET --- */}
+        {/* --- END TICKET --- */}
 
         {/* Vehicle Selection */}
         <div className="space-y-2.5">
@@ -265,43 +230,31 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="pt-1.5 space-y-2">
-            
-            {/* WhatsApp Big Action (Shares image on mobile + opens chat) */}
+          {/* Customer Name */}
+          <div>
+            <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">
+              आपले नाव (Name - Optional)
+            </label>
+            <input 
+              type="text" 
+              value={customerName} 
+              onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="e.g. Rahul Shinde" 
+              className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:outline-none" 
+            />
+          </div>
+
+          {/* Single Direct WhatsApp Button (No confusing download buttons) */}
+          <div className="pt-2">
             <button 
               type="button"
               disabled={isGenerating}
               onClick={handleSendToWhatsApp}
-              className="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-xs sm:text-sm cursor-pointer pulse-green active:scale-98"
+              className="w-full py-4 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-bold rounded-2xl shadow-xl shadow-emerald-600/30 transition flex items-center justify-center space-x-2 text-sm cursor-pointer pulse-green active:scale-98"
             >
-              <WhatsAppIcon className="w-4 h-4 fill-white shrink-0" />
-              <span>{isGenerating ? 'पावती तयार होत आहे...' : 'WhatsApp वर पावती व फोटो पाठवा'}</span>
+              <WhatsAppIcon className="w-5 h-5 fill-white shrink-0" />
+              <span>{isGenerating ? 'पावती तयार होत आहे...' : 'WhatsApp वर पावती पाठवा (Send Slip)'}</span>
             </button>
-
-            {/* Dual Download (Image / PDF) */}
-            <div className="grid grid-cols-2 gap-2">
-              <button 
-                type="button"
-                disabled={isGenerating}
-                onClick={handleDownloadImage}
-                className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition flex items-center justify-center space-x-1.5 text-xs cursor-pointer active:scale-98"
-              >
-                <Download className="w-3.5 h-3.5 text-slate-600" />
-                <span>फोटो डाउनलोड (PNG)</span>
-              </button>
-
-              <button 
-                type="button"
-                disabled={isGenerating}
-                onClick={handleDownloadPDF}
-                className="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-xl transition flex items-center justify-center space-x-1.5 text-xs cursor-pointer active:scale-98"
-              >
-                <FileText className="w-3.5 h-3.5 text-orange-600" />
-                <span>PDF पावती (Ticket)</span>
-              </button>
-            </div>
-
           </div>
         </div>
 
