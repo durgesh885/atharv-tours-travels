@@ -171,46 +171,26 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Handle WhatsApp Image Share
+  // Handle WhatsApp Direct Redirect & Image Auto-Save
   const handleSendTicketImage = async () => {
     setIsSending(true);
 
     try {
-      // 1. Generate PNG Blob instantly via Native Canvas (1ms)
+      // 1. Generate PNG Blob instantly via Native Canvas
       const blob = await generateTicketBlob(bookingData, selectedCar, customerName, slipId);
 
       if (blob) {
-        const file = new File([blob], `Atharv-Ticket-${slipId}.png`, { type: 'image/png' });
-
-        // A. Mobile Native Web Share API (Passes ONLY the PNG Image File)
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: 'Atharv Tours Booking Ticket'
-            });
-            setIsSending(false);
-            onClose();
-            return;
-          } catch (shareErr) {
-            console.log('Native share:', shareErr);
-            if (shareErr.name === 'AbortError') {
-              setIsSending(false);
-              onClose();
-              return;
-            }
-          }
-        }
-
-        // B. Fallback: Auto-download PNG to Gallery / Downloads
+        // Auto-save/Download PNG Ticket directly to user's phone/PC
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
         link.download = `Atharv-Ticket-${slipId}.png`;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
         setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-        // C. Clipboard Copy on Desktop / Laptop
+        // Clipboard Copy on PC/Laptop
         if (navigator.clipboard && window.ClipboardItem) {
           try {
             await navigator.clipboard.write([
@@ -218,17 +198,17 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             ]);
             setCopiedNotification(true);
           } catch (clipErr) {
-            console.log('Clipboard notice:', clipErr);
+            console.log('Clipboard copy notice:', clipErr);
           }
         }
       }
     } catch (err) {
-      console.error('Image share error:', err);
+      console.error('Image generate error:', err);
     }
 
     setIsSending(false);
 
-    // Formatted WhatsApp Receipt (Clear, Beautiful & Structured for Navneet Patil)
+    // Formatted WhatsApp Receipt (Instant, Crystal-Clear for Navneet Patil)
     const formattedSlip = `🚩 *॥ जय मल्हार ॥*
 🎫 *नवीन गाडी बुकिंग पावती (TICKET SLIP)*
 ━━━━━━━━━━━━━━━━━━━━
@@ -245,12 +225,12 @@ ${customerName?.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.t
 ━━━━━━━━━━━━━━━━━━━━
 _नमस्कार नवनीत भाऊ, वरील बुकिंगसाठी आपले सर्वात कमी भाडे (Best Rate) सांगावे._`;
 
-    // Open WhatsApp Chat
-    window.open(`https://wa.me/919637886385?text=${encodeURIComponent(formattedSlip)}`, '_blank');
+    // Direct 1-Click Redirect to Navneet Patil WhatsApp (+91 96378 86385)
+    window.location.href = `https://wa.me/919637886385?text=${encodeURIComponent(formattedSlip)}`;
 
     setTimeout(() => {
       onClose();
-    }, 2000);
+    }, 1500);
   };
 
   return (
