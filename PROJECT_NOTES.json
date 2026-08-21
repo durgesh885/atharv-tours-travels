@@ -1,19 +1,22 @@
 {
   "agency_name": "Atharv Tours & Travels",
-  "client_phone_calling": "+91 75079 90227",
+  "proprietor": "Navneet Patil",
+  "cultural_devotion": "🚩 ॥ जय मल्हार ॥",
+  "official_phone": "+91 96378 86385",
+  "client_phone_calling": "+91 96378 86385",
   "client_phone_whatsapp": "+91 96378 86385",
   "client_email": "navnit9637@gmail.com",
   "office_address": "Kores Heights, Bangala Vasti, Medankarwadi, Chakan, Pune, Maharashtra - 410501",
   "google_maps_short_link": "https://maps.app.goo.gl/mdf1mMqxgSdgR5Ds7",
   "google_maps_lat": 18.7387842,
   "google_maps_lng": 73.8608724,
-  "service_coverage": "Pune / Chakan to All India (Outstation, Airport & Local MIDC)",
-  "owned_fleet_count": 2,
+  "service_coverage": "Pune & Chakan to All India (Outstation, Mumbai Airport & Chakan MIDC)",
   "owned_fleet_models": [
     "Maruti Suzuki Swift Dzire (4+1 AC Sedan)",
-    "Maruti Suzuki Ertiga (6+1 AC MUV)"
+    "Maruti Suzuki Ertiga (6+1 AC 7-Seater)"
   ],
-  "hero_mode": "1_tap_instant_connect_whatsapp_and_call",
+  "live_website_url": "https://atharv-tours-travels.vercel.app/",
+  "github_repo": "https://github.com/durgesh885/atharv-tours-travels.git",
   "lead_developer": "Durgesh",
-  "status": "ready_for_client_review"
+  "status": "production_live_and_active"
 }
