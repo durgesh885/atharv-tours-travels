@@ -15,7 +15,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
   const { pickup, drop, tripType, date } = bookingData;
   const slipId = `ATT-${Math.floor(100000 + Math.random() * 900000)}`;
 
-  // Handle WhatsApp Image Share & Clipboard Copy
+  // Handle WhatsApp Image Share & Fallback
   const handleSendTicketImage = async () => {
     setIsSending(true);
 
@@ -27,7 +27,14 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
           backgroundColor: '#020617'
         });
 
-        // 1. On Mobile Phones (Android & iOS): Native File Share
+        // Auto-download PNG image file to Gallery/Downloads
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = image;
+        link.download = `Atharv-Ticket-${slipId}.png`;
+        link.click();
+
+        // 1. On Mobile with Web Share API (Active on HTTPS / Production)
         if (navigator.share && navigator.canShare) {
           const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
           if (blob) {
@@ -42,7 +49,7 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
                 onClose();
                 return;
               } catch (shareErr) {
-                // Fallback to clipboard & WhatsApp
+                console.log('Native share canceled/fallback:', shareErr);
               }
             }
           }
@@ -62,13 +69,6 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
             console.log('Clipboard copy fallback', clipErr);
           }
         }
-
-        // 3. Auto-download PNG image file to Laptop/Phone
-        const image = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = image;
-        link.download = `Atharv-Ticket-${slipId}.png`;
-        link.click();
       }
     } catch (err) {
       console.log('Image generation error:', err);
@@ -76,12 +76,29 @@ export default function BookingSlipModal({ isOpen, onClose, bookingData }) {
 
     setIsSending(false);
 
-    // Open WhatsApp Chat directly (No pre-filled text, pure image mode!)
-    window.open(`https://wa.me/919637886385`, '_blank');
+    // Formatted WhatsApp Receipt (Clear, Beautiful & Structured for Navneet Patil)
+    const formattedSlip = `🚩 *॥ जय मल्हार ॥*
+🎫 *नवीन गाडी बुकिंग पावती (TICKET SLIP)*
+━━━━━━━━━━━━━━━━━━━━
+📌 *पावती क्र (SLIP NO):* ${slipId}
+${customerName.trim() ? `👤 *ग्राहक (CUSTOMER):* ${customerName.trim()}\n` : ''}📍 *कुठून (PICKUP):* ${pickup || 'Chakan, Pune'}
+🏁 *कुठे (DESTINATION):* ${drop || 'Airport / Outstation'}
+🔄 *प्रकार (TRIP TYPE):* ${tripType}
+📅 *तारीख (DATE):* ${date || 'आज (Today)'}
+🚗 *गाडी (VEHICLE):* ${selectedCar}
+━━━━━━━━━━━━━━━━━━━━
+✨ *अथर्व टुर्स ॲन्ड ट्रॅव्हल्स (CHAKAN - PUNE)*
+👑 *प्रोप्रा. नवनीत पाटील* (📞 +91 96378 86385)
+🛡️ *24x7 Clean AC Cabs • All India Tourist Permit*
+━━━━━━━━━━━━━━━━━━━━
+_नमस्कार नवनीत भाऊ, वरील बुकिंगसाठी आपले सर्वात कमी भाडे (Best Rate) सांगावे._`;
+
+    // Open WhatsApp Chat with structured receipt
+    window.open(`https://wa.me/919637886385?text=${encodeURIComponent(formattedSlip)}`, '_blank');
     
     setTimeout(() => {
       onClose();
-    }, 2000);
+    }, 2500);
   };
 
   return (
